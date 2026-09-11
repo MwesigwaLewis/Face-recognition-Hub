@@ -18,6 +18,8 @@ class FaceResult:
     pitch: float = 0.0
     roll: float = 0.0
     quality: float = 0.0
+    embedding: Optional[object] = None
+    track_id: Optional[int] = None
 
 
 class RecognitionEngine:

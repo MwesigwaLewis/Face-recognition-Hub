@@ -1,4 +1,4 @@
-"""Camera discovery and capture, including USB/external webcams."""
+"""Camera discovery and capture, including USB webcams and RTSP streams."""
 
 from __future__ import annotations
 
@@ -6,10 +6,13 @@ import cv2
 
 
 class Camera:
-    def __init__(self, index=0):
-        self.index = int(index)
+    """Unified camera source. ``source`` may be a USB index or an RTSP URL."""
+
+    def __init__(self, source=0):
+        self.source = source
+        self.index = int(source) if isinstance(source, int) or str(source).isdigit() else None
         self.camera = None
-        self.open(self.index)
+        self.open(source)
 
     @staticmethod
     def list_cameras(max_indices=10):
@@ -26,10 +29,30 @@ class Camera:
             cap.release()
         return found
 
-    def open(self, index):
+    @staticmethod
+    def is_rtsp(source):
+        return isinstance(source, str) and source.lower().startswith("rtsp://")
+
+    def open(self, source):
         if self.camera is not None:
             self.release()
-        self.index = int(index)
+        self.source = source
+
+        if self.is_rtsp(source):
+            self.index = None
+            # FFmpeg is preferred for RTSP. CAP_PROP_BUFFERSIZE=1 helps keep
+            # recognition close to real-time instead of processing stale frames.
+            self.camera = cv2.VideoCapture(source, cv2.CAP_FFMPEG)
+            if not self.camera.isOpened():
+                self.camera.release()
+                self.camera = cv2.VideoCapture(source)
+            if not self.camera.isOpened():
+                self.camera = None
+                raise RuntimeError("RTSP stream could not be opened.")
+            self.camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            return
+
+        self.index = int(source)
         self.camera = cv2.VideoCapture(self.index, cv2.CAP_DSHOW)
         if not self.camera.isOpened():
             self.camera.release()

@@ -2,9 +2,9 @@
 
 import time
 import numpy as np
-from PySide6.QtCore import Qt, QRectF, QPointF
+from PySide6.QtCore import Qt, QRectF, QPointF, Signal
 from PySide6.QtGui import QImage, QPixmap, QPainter, QPen, QColor, QFont
-from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout
+from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout, QSizePolicy
 
 GREEN = QColor("#3CFF7A")
 GREEN_DIM = QColor(60, 255, 122, 120)
@@ -14,13 +14,20 @@ PANEL_BG = QColor(10, 16, 14, 210)
 
 
 class VideoPanel(QWidget):
-    """Displays the camera frame and draws recognition overlays on top."""
+    """Displays one camera feed and its recognition overlays."""
+
+    double_clicked = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._pixmap: QPixmap | None = None
         self._faces = []
         self._frame_size = (1, 1)
+        # Hikvision DVR streams can report legacy 4:3/5:4 encoded dimensions
+        # even when the camera is intended to be displayed as 16:9. VLC can
+        # correct this with its aspect-ratio control, so mirror that behavior
+        # in the Lewiscrypt viewer without changing the recognition frame.
+        self._display_aspect = None
         self._quality = "GOOD"
         self._message = None
         self._scan_wave = []
@@ -31,9 +38,22 @@ class VideoPanel(QWidget):
         self._enroll_overlay = None
         self._enroll_thumbnails = []  # captured-angle QPixmaps, shown as a strip
         self._capture_flash_t = 0.0
-        self.setMinimumSize(480, 360)
+        self._compact_mode = False
+        # Camera walls may contain up to 16 feeds. Do not impose a large
+        # minimum size or a multi-row wall will overflow the available space.
+        self.setMinimumSize(0, 0)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     # ---- public API -----------------------------------------------------
+
+    def set_compact_mode(self, compact=True):
+        self._compact_mode = bool(compact)
+        self.update()
+
+    def set_display_aspect_ratio(self, ratio=None):
+        """Set viewer display ratio (e.g. 16/9), or None for source ratio."""
+        self._display_aspect = float(ratio) if ratio else None
+        self.update()
 
     def update_frame(self, frame_bgr: np.ndarray):
         """frame_bgr: OpenCV BGR numpy array."""
@@ -104,6 +124,13 @@ class VideoPanel(QWidget):
         self._capture_flash_t = time.time()
         self.update()
 
+    def mouseDoubleClickEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.double_clicked.emit()
+            event.accept()
+            return
+        super().mouseDoubleClickEvent(event)
+
     # ---- painting ---------------------------------------------------------
 
     def paintEvent(self, event):
@@ -142,8 +169,10 @@ class VideoPanel(QWidget):
             for face in self._faces:
                 self._draw_face(painter, face, scale, offset)
 
-            # bottom-left analyzing panel
-            self._draw_analysis_panel(painter)
+            # Keep the camera wall clean. Detailed analysis is shown only
+            # when a feed is focused; tiny tiles get a minimal status HUD.
+            if not self._compact_mode:
+                self._draw_analysis_panel(painter)
 
         painter.end()
 
@@ -154,8 +183,13 @@ class VideoPanel(QWidget):
         pw, ph = self.width(), self.height()
         if w == 0 or h == 0:
             return QRectF(0, 0, pw, ph), 1.0, (0, 0)
-        frame_ratio = w / h
-        panel_ratio = pw / ph
+
+        # If an explicit display ratio is selected, preserve the full source
+        # frame but allow non-uniform X/Y scaling, matching VLC's aspect-ratio
+        # correction. This is display-only; recognition still sees original
+        # pixels and coordinates.
+        frame_ratio = self._display_aspect or (w / h)
+        panel_ratio = pw / ph if ph else frame_ratio
         if frame_ratio > panel_ratio:
             draw_w = pw
             draw_h = pw / frame_ratio
@@ -165,9 +199,12 @@ class VideoPanel(QWidget):
         x = (pw - draw_w) / 2
         y = (ph - draw_h) / 2
         scale = draw_w / w
-        return QRectF(x, y, draw_w, draw_h), scale, (x, y)
+        scale_y = draw_h / h
+        return QRectF(x, y, draw_w, draw_h), (scale, scale_y), (x, y)
 
     def _map_pt(self, x, y, scale, offset):
+        if isinstance(scale, tuple):
+            return QPointF(offset[0] + x * scale[0], offset[1] + y * scale[1])
         return QPointF(offset[0] + x * scale, offset[1] + y * scale)
 
     def _draw_face(self, painter, face, scale, offset):
@@ -206,8 +243,17 @@ class VideoPanel(QWidget):
                 lp = self._map_pt(lx, ly, scale, offset)
                 painter.drawEllipse(lp, 1.6, 1.6)
 
-        # identity card to the right of the face (or left if too close to edge)
-        self._draw_id_card(painter, face, rect)
+        # Full identity cards are too intrusive on a multi-camera wall.
+        if not self._compact_mode:
+            self._draw_id_card(painter, face, rect)
+        else:
+            label = face.name.upper() if face.name.upper() != "UNKNOWN" else "UNKNOWN"
+            painter.setFont(QFont("Consolas", 8, QFont.Bold))
+            painter.setPen(color)
+            label_rect = QRectF(rect.left(), max(2, rect.top() - 18), min(150, max(70, rect.width())), 16)
+            painter.setBrush(QColor(5, 8, 7, 190))
+            painter.drawRect(label_rect)
+            painter.drawText(label_rect.adjusted(5, 0, -5, 0), Qt.AlignVCenter | Qt.AlignLeft, label[:20])
 
     def _draw_id_card(self, painter, face, face_rect):
         card_w, card_h = 250, 190

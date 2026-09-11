@@ -1,3 +1,41 @@
 {
-  "recognition_threshold": 0.8
+  "recognition_threshold": 0.3,
+  "camera_source": "0",
+  "display_aspect_ratio": "16:9",
+  "rtsp_streams": [
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/101",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/201",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/301",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/401",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/501",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/601",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/701",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/801",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/901",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/1001",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/1101",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/1201",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/1301",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/1401",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/1501",
+    "rtsp://admin:Mydoom027@192.168.100.50:554/Streaming/channels/1601"
+  ],
+  "rtsp_enabled_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ]
 }

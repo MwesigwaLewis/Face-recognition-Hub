@@ -142,4 +142,49 @@ def get_people_records():
     ]
 
 
+def add_detection_log(camera, name, confidence, snapshot=None):
+    """Persist one stabilized surveillance detection. Does not touch face records."""
+    with get_connection() as conn:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS detection_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                camera TEXT NOT NULL,
+                name TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                snapshot BLOB
+            )"""
+        )
+        conn.execute(
+            "INSERT INTO detection_logs (camera, name, confidence, snapshot) VALUES (?, ?, ?, ?)",
+            (str(camera), str(name), float(confidence), snapshot),
+        )
+
+def get_detection_logs(limit=100):
+    """Return newest surveillance detections without modifying existing face data."""
+    with get_connection() as conn:
+        conn.execute(
+            """CREATE TABLE IF NOT EXISTS detection_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                camera TEXT NOT NULL,
+                name TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                snapshot BLOB
+            )"""
+        )
+        rows = conn.execute(
+            "SELECT id, timestamp, camera, name, confidence, snapshot FROM detection_logs ORDER BY id DESC LIMIT ?",
+            (max(1, int(limit)),),
+        ).fetchall()
+    return [
+        {"id": r[0], "timestamp": r[1], "camera": r[2], "name": r[3], "confidence": float(r[4]), "snapshot": r[5]}
+        for r in rows
+    ]
+
+def clear_detection_logs():
+    with get_connection() as conn:
+        conn.execute("DROP TABLE IF EXISTS detection_logs")
+
+
 create_table()

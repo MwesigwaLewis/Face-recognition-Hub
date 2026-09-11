@@ -7,9 +7,10 @@ import numpy as np
 
 
 class FaceEngine:
-    def __init__(self, det_size=(640, 640)):
+    def __init__(self, det_size=(800, 800)):
         self.model = None
         self.det_size = det_size
+        self.det_thresh = 0.55
         self.providers = []
         self.active_backend = "UNINITIALIZED"
         self.last_gpu_error = None
@@ -50,7 +51,7 @@ class FaceEngine:
         import insightface
         self._configure_nvidia_dlls()
         model = insightface.app.FaceAnalysis(name="buffalo_l", providers=providers)
-        model.prepare(ctx_id=0 if "CUDAExecutionProvider" in providers else -1, det_size=self.det_size)
+        model.prepare(ctx_id=0 if "CUDAExecutionProvider" in providers else -1, det_size=self.det_size, det_thresh=self.det_thresh)
         self.model = model
         self.providers = list(providers)
 

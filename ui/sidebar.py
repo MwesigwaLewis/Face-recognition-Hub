@@ -146,10 +146,6 @@ class Sidebar(QWidget):
         scroll.setWidget(people_holder)
         root.addWidget(scroll, 1)
 
-        view_all_btn = QPushButton("👥  VIEW ALL PEOPLE")
-        view_all_btn.setObjectName("viewAllBtn")
-        root.addWidget(view_all_btn)
-
         self._cards = []
 
     # ---- public API -------------------------------------------------
