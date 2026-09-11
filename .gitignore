@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Local databases / biometric data
+**/data/*.db
+**/data/*.sqlite
+**/data/*.sqlite3
+**/core/data/*.db
+
+# Enrolled face images and test captures
+manually enrolled faces/*
+!manually enrolled faces/.gitkeep
+**/enrolled_faces/
+**/face_captures/
+**/captures/
+**/*.jpg
+**/*.jpeg
+**/*.png
+**/*.webp
+
+# Logs / local runtime files
+*.log
+logs/
+*.tmp
+*.bak

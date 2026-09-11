@@ -1,0 +1,2 @@
+# Base dependencies. Lewis chooses the CPU/GPU inference backend at first run.
+-r requirements-base.txt

@@ -1,0 +1,161 @@
+QWidget {
+    background-color: #0b1210;
+    color: #d7e6df;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 13px;
+}
+
+#topBar {
+    background-color: #0e1613;
+    border-bottom: 1px solid #1c2b25;
+}
+#appTitle {
+    font-weight: 600;
+    font-size: 14px;
+    color: #e7f5ee;
+    padding-left: 6px;
+}
+#clockLabel {
+    color: #d7e6df;
+    font-weight: 600;
+}
+#dateLabel {
+    color: #93a49c;
+}
+
+#sidebar {
+    background-color: #0e1613;
+    border-right: 1px solid #1c2b25;
+}
+#liveLabel {
+    color: #3CFF7A;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+#sectionTitle {
+    color: #37E6FF;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 4px 0;
+}
+#card {
+    background-color: #101b17;
+    border: 1px solid #1c2b25;
+    border-radius: 6px;
+}
+#statusLabel {
+    color: #93a49c;
+}
+#personCard {
+    background-color: #101b17;
+    border: 1px solid #1c2b25;
+    border-radius: 6px;
+}
+#personCard:hover {
+    border: 1px solid #2c4a3d;
+}
+#personName {
+    font-weight: 700;
+    color: #eafff0;
+}
+#viewAllBtn {
+    background-color: #101b17;
+    border: 1px solid #1c2b25;
+    border-radius: 6px;
+    padding: 10px;
+    color: #d7e6df;
+    font-weight: 600;
+}
+#viewAllBtn:hover {
+    border: 1px solid #3CFF7A;
+    color: #3CFF7A;
+}
+
+#bottomNav {
+    background-color: #0e1613;
+    border-top: 1px solid #1c2b25;
+}
+QPushButton#navBtn {
+    background: transparent;
+    border: none;
+    color: #93a49c;
+    font-weight: 600;
+    border-top: 2px solid transparent;
+}
+QPushButton#navBtn:hover {
+    color: #d7e6df;
+    background-color: #101b17;
+}
+QPushButton#navBtn:checked {
+    color: #3CFF7A;
+    border-top: 2px solid #3CFF7A;
+    background-color: #101b17;
+}
+
+QScrollBar:vertical {
+    background: #0e1613;
+    width: 8px;
+}
+QScrollBar::handle:vertical {
+    background: #24352d;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #3CFF7A;
+}
+
+#pageTitle { color:#eafff0; font-size:28px; font-weight:800; letter-spacing:1px; }
+#pageSubtitle { color:#71827a; font-size:13px; }
+#pageCard, #personTile { background:#101b17; border:1px solid #1c2b25; border-radius:10px; }
+#personTile { min-height:130px; }
+#tileName { color:#eafff0; font-size:16px; font-weight:800; }
+#tileMeta, #infoLabel { color:#81928a; }
+QLineEdit#input { background:#0b1210; border:1px solid #294238; border-radius:7px; padding:10px; color:#eafff0; }
+QLineEdit#input:focus { border:1px solid #3CFF7A; }
+QPushButton#primaryBtn { background:#3CFF7A; color:#07100b; border:none; border-radius:7px; padding:11px 18px; font-weight:800; }
+QPushButton#primaryBtn:hover { background:#6dff9a; }
+QPushButton#dangerBtn { background:transparent; color:#ff6b6b; border:1px solid #47282a; border-radius:6px; padding:7px; }
+QPushButton#dangerBtn:hover { background:#291619; border-color:#ff6b6b; }
+QScrollArea { background:transparent; }
+QMessageBox { background:#101b17; }
+QPushButton { outline:none; }
+
+#enrollDrawer {
+    background-color: #0e1613;
+    border: 1px solid #1c2b25;
+    border-radius: 10px;
+}
+
+#captureCountdown {
+    color: #3CFF7A;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    padding: 12px;
+    background: #0b1210;
+    border: 1px solid #1c2b25;
+    border-radius: 8px;
+}
+QComboBox#cameraCombo {
+    background: #0b1210;
+    border: 1px solid #294238;
+    border-radius: 7px;
+    padding: 10px;
+    color: #eafff0;
+}
+QComboBox#cameraCombo QAbstractItemView {
+    background: #101b17;
+    color: #eafff0;
+    selection-background-color: #1c4030;
+}
+QProgressBar {
+    background: #16211c;
+    border: 1px solid #1c2b25;
+    border-radius: 4px;
+    min-height: 8px;
+}
+QProgressBar::chunk {
+    background: #3CFF7A;
+    border-radius: 4px;
+}
