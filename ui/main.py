@@ -255,13 +255,18 @@ class EnrollDrawer(QFrame):
     finished = Signal(bool, str)
 
     TARGET_TOTAL = 20        # stop once this many distinct angles are captured
-    MIN_TOTAL = 8            # floor before auto-finish-on-timeout or manual finish is allowed
+    MIN_TOTAL = 12           # floor before auto-finish-on-timeout or manual finish is allowed --
+                              # raised from 8: that let the time-based auto-finish below settle
+                              # for well under half the target the moment 6s elapsed, quitting
+                              # long before genuine full-ring coverage
     MAX_PER_SEGMENT = 2      # cap captures kept from any single ring position
     MAX_CENTERED = TARGET_TOTAL  # no extra cap when pose is unavailable/dead-center;
                                   # the embedding-novelty check below already guards
                                   # diversity independently of ring classification
-    TIME_BUDGET = 6.0        # seconds; auto-finish once reached IF MIN_TOTAL is met
-    HARD_CAP_TIME = 20.0     # seconds; finish regardless, with whatever was captured
+    TIME_BUDGET = 12.0       # seconds; auto-finish once reached IF MIN_TOTAL is met -- doubled
+                              # from 6.0s, which is an unrealistically short window for a real
+                              # person to physically sweep through most of a 12-position ring
+    HARD_CAP_TIME = 25.0     # seconds; finish regardless, with whatever was captured
     DUPLICATE_SIM_THRESHOLD = 0.985   # reject a capture too similar to one already kept
     SUBMIT_INTERVAL = 0.09   # ~11 fps of enrollment analysis
 
