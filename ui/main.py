@@ -119,7 +119,17 @@ class RealEngine(RecognitionEngine):
             lighting_ok=lighting["ok"], lighting_label=lighting["label"],
             pose_ok=pose_ok, quality_ok=quality_ok,
         )
-        if lighting["ok"] and pose_ok and quality_ok and bbox[2] > 0 and bbox[3] > 0:
+        # IMPORTANT: the face embedding comes directly from the detector's
+        # own model output (face.embedding), not from pose estimation --
+        # pose is only used to pick a ring segment for spreading captures
+        # around. Gating capture on pose_ok here (as an earlier version did)
+        # meant that if pose estimation ever failed on real camera frames --
+        # for any reason, including one this sandbox's synthetic tests can't
+        # reproduce -- every single frame would silently fail to capture
+        # with NO visible error, since pose_ok isn't a banner-worthy gate.
+        # Lighting and quality are the only things actually worth blocking
+        # on here, and both already have visible banners.
+        if lighting["ok"] and quality_ok and bbox[2] > 0 and bbox[3] > 0:
             result.embedding = self.engine.normalize(face.embedding)
             result.thumbnail = frame[y1c:y2c, x1c:x2c].copy()
         return result
@@ -247,7 +257,9 @@ class EnrollDrawer(QFrame):
     TARGET_TOTAL = 20        # stop once this many distinct angles are captured
     MIN_TOTAL = 8            # floor before auto-finish-on-timeout or manual finish is allowed
     MAX_PER_SEGMENT = 2      # cap captures kept from any single ring position
-    MAX_CENTERED = 3         # cap captures kept while looking straight ahead (no ring segment)
+    MAX_CENTERED = TARGET_TOTAL  # no extra cap when pose is unavailable/dead-center;
+                                  # the embedding-novelty check below already guards
+                                  # diversity independently of ring classification
     TIME_BUDGET = 6.0        # seconds; auto-finish once reached IF MIN_TOTAL is met
     HARD_CAP_TIME = 20.0     # seconds; finish regardless, with whatever was captured
     DUPLICATE_SIM_THRESHOLD = 0.985   # reject a capture too similar to one already kept
